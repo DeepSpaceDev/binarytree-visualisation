@@ -1,0 +1,45 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="binary-node.html">
+
+<!--
+An element for visualising a binary tree and perform different operations on it.
+
+Example:
+
+    <binarytree-visualisation></binarytree-visualisation>
+
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="binarytree-visualisation">
+  <template>
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+      }
+    </style>
+    <binary-node></binary-node>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'binarytree-visualisation',
+
+      properties: {
+        
+      }
+    });
+  </script>
+</dom-module>

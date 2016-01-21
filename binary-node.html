@@ -1,0 +1,32 @@
+<dom-module id="binary-node">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        box-sizing: border-box;
+      }
+    </style>
+    <canvas id="node" width="50" height="50"></canvas>
+  </template>
+  <script>
+    Polymer({
+      is: 'binary-node',
+
+      attached: function () {
+        var ctx = this.$.node.getContext('2d');
+
+        ctx.beginPath();
+        ctx.arc(25, 25, 15, 0, 2 * Math.PI, false);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(11, 39, 5, 0, 2 * Math.PI, false);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(39, 39, 5, 0, 2 * Math.PI, false);
+        ctx.stroke();
+      }
+    });
+  </script>
+</dom-module>
