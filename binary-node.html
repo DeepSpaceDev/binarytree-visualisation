@@ -12,6 +12,52 @@
     Polymer({
       is: 'binary-node',
 
+      properties: {
+        value: {
+          value: '',
+          left: {
+            type: Boolean,
+            value: false
+          },
+          right: {
+            type: Boolean,
+            value: false
+          }
+        }
+      },
+
+      listeners: {
+        'click': '_handleClick'
+      },
+
+      _handleClick: function (e) {
+        var x = e.offsetX;
+        var y = e.offsetY;
+
+        var leftXMin = 6;
+        var leftXMax = 16;
+        var rightXMin = 34;
+        var rightXMax = 44;
+
+        var yMin = 34;
+        var yMax = 44;
+
+        if(y > yMin && y < yMax) {
+          if(x > leftXMin && x < leftXMax && !this.left) {
+            this.fire('addChild', {
+              right: false,
+              left: true
+            });
+          }
+          if(x > rightXMin && x < rightXMax  && !this.right) {
+            this.fire('addChild', {
+              right: true,
+              left: false
+            });
+          }
+        }
+      },
+
       attached: function () {
         var ctx = this.$.node.getContext('2d');
 

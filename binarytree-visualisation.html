@@ -9,6 +9,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="binary-node.html">
 
 <!--
@@ -29,8 +33,26 @@ Example:
         display: block;
         box-sizing: border-box;
       }
+      paper-dialog {
+        padding: 16px;
+      }
     </style>
-    <binary-node></binary-node>
+    <paper-toast id="noVal" text="Please provide an value"></paper-toast>
+
+    <paper-dialog id="selectValue" modal>
+      <h2>Please insert a value for the node</h2>
+      <paper-dialog-scrollable>
+        <paper-input label="value" value="{{_value}}" required></paper-input>
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm>Add Node</paper-button>
+      </div>
+    </paper-dialog>
+
+    <section id="nodeContainer">
+      <binary-node id="root" value="2"></binary-node>
+    </section>
   </template>
 
   <script>
@@ -38,7 +60,96 @@ Example:
       is: 'binarytree-visualisation',
 
       properties: {
-        
+        tree: {
+          type: Object,
+          value: function () {
+            return {
+              value: '2',
+              left: null,
+              right: null
+            }
+          }
+        }
+      },
+
+      listeners: {
+        'addChild': '_onAddChild',
+        'iron-overlay-closed': 'addChild'
+      },
+
+      observers: ['_treeUpdated(tree.*)'],
+
+      _treeUpdated: function (changeRecord) {
+        console.log(changeRecord);
+        // this.$.nodeContainer.innerHTML = '';
+        this.repaint(this.tree);
+      },
+
+      _onAddChild: function(e) {
+        this._parent = e.target;
+        if(e.detail.left) 
+          this._side = 'left';
+        else
+          this._side = 'right';
+        this._value = '';
+        this.$.selectValue.open();
+      },
+
+      addChild: function (e) {
+        if(e.detail.confirmed && this._value !== '') {
+          console.log(this._parent);
+          var parent  = this.searchForElement(this._parent.value);
+          console.log(parent);
+          this._parent[this._side] = true;
+          parent[this._side] = {
+            value: this._value,
+            right: null,
+            left: null
+          };
+        } else {
+          if(this._value === '' && e.detail.confirmed)
+            this.$.noVal.show();
+        }
+      },
+
+      searchForElement: function (value) {
+        return this.inOrder(this.tree, value);
+      },
+
+      inOrder: function(node, value) {
+        var result = null;
+
+        if(node.left != null)
+          result = this.inOrder(node.left, value);
+        if(node.value == value)
+          return node;
+        if(node.right != null)
+          result = this.inOrder(node.right, value);
+        return result;
+      },
+
+      repaint: function(node) {
+        var stack = [];
+
+        while (node != null) {
+          stack.push(node);
+          node = node.left;
+        }
+        // Traverse the tree
+        while (stack.length > 0) {
+          // Visit the top node
+          node = stack.pop();
+          console.log(node.value);
+          // Find the next node
+          if (node.right != null) {
+            node = node.right;
+            // The next node to be visited is the leftmost
+            while (node != null) {
+              stack.push(node);
+              node = node.left;
+            }
+          }
+        }
       }
     });
   </script>
