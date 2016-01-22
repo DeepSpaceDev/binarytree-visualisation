@@ -36,6 +36,12 @@ Example:
       paper-dialog {
         padding: 16px;
       }
+      binary-node#tree {
+        left: calc(50% - 25px);
+      }
+      section {
+        width: 100%;
+      }
     </style>
     <paper-toast id="noVal" text="Please provide an value"></paper-toast>
 
@@ -51,7 +57,7 @@ Example:
     </paper-dialog>
 
     <section id="nodeContainer">
-      <binary-node id="root" value="2"></binary-node>
+      <binary-node id="tree" value="2"></binary-node>
     </section>
   </template>
 
@@ -82,7 +88,24 @@ Example:
       _treeUpdated: function (changeRecord) {
         console.log(changeRecord);
         // this.$.nodeContainer.innerHTML = '';
-        this.repaint(this.tree);
+        // this.repaint(this.tree);
+        var path = changeRecord.path;
+        var node = this.querySelector('#' + path);
+        if(!node) {
+          var el = document.createElement('binary-node');
+          var pathes = path.split('.');
+          console.log(pathes);
+          var lefts = this.countOccurrences(pathes, 'left');
+          var rights = this.countOccurrences(pathes, 'right');
+          console.log(lefts);
+          console.log(rights);
+          el.id = path;
+          el.value = changeRecord.value.value;
+          var horizOffset = -25 + rights * 75 - lefts * 75;
+          el.style.left = 'calc(50% + ' + horizOffset + 'px)';
+          el.style.top = (pathes.length - 1) * 50 +'px';
+          this.$.nodeContainer.appendChild(el);
+        }
       },
 
       _onAddChild: function(e) {
@@ -97,15 +120,16 @@ Example:
 
       addChild: function (e) {
         if(e.detail.confirmed && this._value !== '') {
-          console.log(this._parent);
-          var parent  = this.searchForElement(this._parent.value);
-          console.log(parent);
+          // var parent  = this.searchForElement(this._parent.value);
           this._parent[this._side] = true;
-          parent[this._side] = {
+          // console.log(parent);
+          var path = this._parent.id + '.' + this._side;
+          console.log(path);
+          this.set(path, {
             value: this._value,
             right: null,
             left: null
-          };
+          });
         } else {
           if(this._value === '' && e.detail.confirmed)
             this.$.noVal.show();
@@ -128,28 +152,13 @@ Example:
         return result;
       },
 
-      repaint: function(node) {
-        var stack = [];
-
-        while (node != null) {
-          stack.push(node);
-          node = node.left;
+      countOccurrences: function(array, type) {
+        var result = 0;
+        for(var i = 0; i< array.length; i++) {
+          if(array[i] === type)
+            result++;
         }
-        // Traverse the tree
-        while (stack.length > 0) {
-          // Visit the top node
-          node = stack.pop();
-          console.log(node.value);
-          // Find the next node
-          if (node.right != null) {
-            node = node.right;
-            // The next node to be visited is the leftmost
-            while (node != null) {
-              stack.push(node);
-              node = node.left;
-            }
-          }
-        }
+        return result;
       }
     });
   </script>
