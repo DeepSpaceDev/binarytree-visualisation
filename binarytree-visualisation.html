@@ -9,10 +9,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-fab/paper-fab.html">
+<link rel="import" href="binary-tree.html">
 <link rel="import" href="binary-node.html">
 
 <!--
@@ -31,13 +38,17 @@ Example:
     <style>
       :host {
         display: block;
+        width: 100%;
+        height: 100%;
         box-sizing: border-box;
       }
       paper-dialog {
         padding: 16px;
       }
-      binary-node#tree {
-        left: calc(50% - 25px);
+      paper-fab {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
       }
       section {
         width: 100%;
@@ -45,20 +56,41 @@ Example:
     </style>
     <paper-toast id="noVal" text="Please provide an value"></paper-toast>
 
-    <paper-dialog id="selectValue" modal>
-      <h2>Please insert a value for the node</h2>
+    <paper-dialog id="addTreeDialog" modal>
+      <h2>Please insert a value and a name for the root node</h2>
       <paper-dialog-scrollable>
+        <paper-input label="name" value="{{_name}}" required></paper-input>
         <paper-input label="value" value="{{_value}}" required></paper-input>
       </paper-dialog-scrollable>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm>Add Node</paper-button>
+        <paper-button dialog-confirm>Add Tree</paper-button>
       </div>
     </paper-dialog>
 
-    <section id="nodeContainer">
-      <binary-node id="tree" value="2"></binary-node>
-    </section>
+    <paper-drawer-panel force-narrow>
+      <paper-header-panel drawer>
+        <paper-toolbar>
+          <paper-icon-button 
+            icon="arrow-back" 
+            style="color: white;"
+            paper-drawer-toggle>
+          </paper-icon-button>
+        </paper-toolbar>
+        <div> Legende ... </div>
+      </paper-header-panel>
+      <paper-header-panel main>
+        <paper-toolbar>
+          <paper-icon-button icon="view-list" paper-drawer-toggle>
+          </paper-icon-button>
+        </paper-toolbar>
+        <section id="treeContainer">
+          
+        </section>
+      </paper-header-panel>
+    </paper-drawer-panel>
+
+    <paper-fab icon="add" on-tap="addTree"></paper-fab>
   </template>
 
   <script>
@@ -66,73 +98,33 @@ Example:
       is: 'binarytree-visualisation',
 
       properties: {
-        tree: {
-          type: Object,
-          value: function () {
-            return {
-              value: '2',
-              left: null,
-              right: null
-            }
-          }
-        }
+        
       },
 
       listeners: {
-        'addChild': '_onAddChild',
-        'iron-overlay-closed': 'addChild'
+        'iron-overlay-closed': '_addTree'
       },
 
-      observers: ['_treeUpdated(tree.*)'],
-
-      _treeUpdated: function (changeRecord) {
-        console.log(changeRecord);
-        // this.$.nodeContainer.innerHTML = '';
-        // this.repaint(this.tree);
-        var path = changeRecord.path;
-        var node = this.querySelector('#' + path);
-        if(!node) {
-          var el = document.createElement('binary-node');
-          var pathes = path.split('.');
-          console.log(pathes);
-          var lefts = this.countOccurrences(pathes, 'left');
-          var rights = this.countOccurrences(pathes, 'right');
-          console.log(lefts);
-          console.log(rights);
-          el.id = path;
-          el.value = changeRecord.value.value;
-          var horizOffset = -25 + rights * 75 - lefts * 75;
-          el.style.left = 'calc(50% + ' + horizOffset + 'px)';
-          el.style.top = (pathes.length - 1) * 50 +'px';
-          this.$.nodeContainer.appendChild(el);
-        }
+      addTree: function() {
+        this.$.addTreeDialog.open();
       },
 
-      _onAddChild: function(e) {
-        this._parent = e.target;
-        if(e.detail.left) 
-          this._side = 'left';
-        else
-          this._side = 'right';
-        this._value = '';
-        this.$.selectValue.open();
-      },
-
-      addChild: function (e) {
-        if(e.detail.confirmed && this._value !== '') {
-          // var parent  = this.searchForElement(this._parent.value);
-          this._parent[this._side] = true;
-          // console.log(parent);
-          var path = this._parent.id + '.' + this._side;
-          console.log(path);
-          this.set(path, {
-            value: this._value,
-            right: null,
-            left: null
-          });
-        } else {
-          if(this._value === '' && e.detail.confirmed)
-            this.$.noVal.show();
+      _addTree: function (e) {
+        if(e.target.id === 'addTreeDialog') {
+          if(e.detail.confirmed && this._value !== '') {
+            var tree = document.createElement('binary-tree');
+            console.log(tree.tree);
+            tree.$.tree.value = this._value;
+            tree.tree.value = this._value;
+            tree.name = this._name;
+            console.log(tree.tree);
+            this.$.treeContainer.appendChild(tree);
+            this._value = '';
+            this._name = '';
+          } else {
+            if(this._value === '' && e.detail.confirmed)
+              this.$.noVal.show();
+          }
         }
       },
 
@@ -141,7 +133,7 @@ Example:
       },
 
       inOrder: function(node, value) {
-        var result = null;
+        /*var result = null;
 
         if(node.left != null)
           result = this.inOrder(node.left, value);
@@ -149,16 +141,7 @@ Example:
           return node;
         if(node.right != null)
           result = this.inOrder(node.right, value);
-        return result;
-      },
-
-      countOccurrences: function(array, type) {
-        var result = 0;
-        for(var i = 0; i< array.length; i++) {
-          if(array[i] === type)
-            result++;
-        }
-        return result;
+        return result;*/
       }
     });
   </script>

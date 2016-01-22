@@ -1,0 +1,150 @@
+<dom-module id="binary-tree">
+  <template>
+    <style>
+      :host {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      paper-dialog {
+        padding: 16px;
+      }
+      binary-node#tree {
+        left: calc(50% - 25px);
+      }
+      #name {
+        position: absolute;
+        left: calc(50% - 90px);
+        top: -10px;
+        width: 60px;
+      }
+      #completness {
+        position: absolute;
+        top: 15px;
+        left: calc(50% + 25px);
+        font-size: small;
+      }
+    </style>
+    <paper-toast id="noVal" text="Please provide an value"></paper-toast>
+
+    <paper-dialog id="selectValue" modal>
+      <h2>Please insert a value for the node</h2>
+      <paper-dialog-scrollable>
+        <paper-input label="value" value="{{_value}}" required></paper-input>
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm>Add Node</paper-button>
+      </div>
+    </paper-dialog>
+
+    <section id="nodeContainer">
+      <div id="name">
+        <paper-input label="name" value="{{name}}"></paper-input>
+      </div>
+      <div id="completness">[[completness]]</div>
+      <binary-node id="tree"></binary-node>
+    </section>
+  </template>
+  <script>
+    Polymer({
+      is: 'binary-tree',
+
+      properties: {
+        name: {
+          type: String,
+          value: ''
+        },
+        tree: {
+          type: Object,
+          value: function () {
+            return {
+              left: null,
+              right: null
+            }
+          }
+        },
+        complete: {
+          type: Boolean,
+          value: false
+        },
+        full: {
+          type: Boolean,
+          value: false
+        }
+      },
+
+      listeners: {
+        'addChild': '_onAddChild',
+        'iron-overlay-closed': 'addChild'
+      },
+
+      observers: ['_treeUpdated(tree.*)'],
+
+      computeCompletness: function () {
+        //TODO
+        this.complete = false;
+        this.full = false;
+        if(this.full)
+          this.completness = 'full';
+        else if(this.complete)
+          this.completness = 'complete';
+        else
+          this.completness = 'Not complete or full';
+      },
+
+      _treeUpdated: function (changeRecord) {
+        var path = changeRecord.path;
+        var node = this.querySelector('#' + path);
+        if(!node) {
+          var el = document.createElement('binary-node');
+          var pathes = path.split('.');
+          var lefts = this.countOccurrences(pathes, 'left');
+          var rights = this.countOccurrences(pathes, 'right');;
+          el.id = path;
+          el.value = changeRecord.value.value;
+          var horizOffset = -25 + rights * 75 - lefts * 75;
+          el.style.left = 'calc(50% + ' + horizOffset + 'px)';
+          el.style.top = (pathes.length - 1) * 50 +'px';
+          this.$.nodeContainer.appendChild(el);
+        }
+        this.computeCompletness();
+      },
+
+      _onAddChild: function(e) {
+        this._parent = e.target;
+        if(e.detail.left) 
+          this._side = 'left';
+        else
+          this._side = 'right';
+        this._value = '';
+        this.$.selectValue.open();
+      },
+
+      addChild: function (e) {
+        if(e.detail.confirmed && this._value !== '') {
+          this._parent[this._side] = true;
+          var path = this._parent.id + '.' + this._side;
+          console.log(path);
+          this.set(path, {
+            value: this._value,
+            right: null,
+            left: null
+          });
+        } else {
+          if(this._value === '' && e.detail.confirmed)
+            this.$.noVal.show();
+        }
+      },
+
+      countOccurrences: function(array, type) {
+        var result = 0;
+        for(var i = 0; i< array.length; i++) {
+          if(array[i] === type)
+            result++;
+        }
+        return result;
+      }
+    });
+  </script>
+</dom-module>
