@@ -5,6 +5,7 @@
         display: block;
         position: absolute;
         box-sizing: border-box;
+        cursor: pointer;
       }
     </style>
     <canvas id="node" width="50" height="50"></canvas>
@@ -25,12 +26,25 @@
         right: {
           type: Boolean,
           value: false
+        },
+        x: {
+          type: Number
+        },
+        y: {
+          type: Number
+        },
+        _x: {
+          type: Number,
+          readOnly: true
         }
       },
 
       listeners: {
-        'click': '_handleClick'
+        'click': '_handleClick',
+        'track': '_onTrack'
       },
+
+      observers: ['_translationChanged(x, y)'],
 
       valueChanged: function(value) {
         this.repaint();
@@ -62,6 +76,24 @@
             });
           }
         }
+      },
+
+      _onTrack: function(e) {
+        if(this.id === 'tree')
+          return;
+        var state = e.detail.state;
+        var dx = e.detail.dx;
+        if(state === 'start') {
+          this._set_x(this.x);
+          return;
+        }
+        this.x = this._x + dx;
+        this.fire('nodeMoved');
+      },
+
+      _translationChanged: function(x, y) {
+        this.style.left = 'calc(50% - 25px + ' + x + 'px)';
+        this.style.top = y + 'px';
       },
 
       attached: function () {

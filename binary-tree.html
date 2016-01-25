@@ -9,6 +9,9 @@
       paper-dialog {
         padding: 16px;
       }
+      #connections {
+        position: absolute;
+      }
       binary-node#tree {
         left: calc(50% - 25px);
       }
@@ -39,11 +42,12 @@
     </paper-dialog>
 
     <section id="nodeContainer">
+      <canvas id="connections"></canvas>
       <div id="name">
         <paper-input label="name" value="{{name}}"></paper-input>
       </div>
       <div id="completness">[[completness]]</div>
-      <binary-node id="tree"></binary-node>
+      <binary-node id="tree" x="0" y="0"></binary-node>
     </section>
   </template>
   <script>
@@ -75,6 +79,8 @@
       },
 
       listeners: {
+        'resize': '_onResize',
+        'nodeMoved': 'repaintConnections',
         'addChild': '_onAddChild',
         'iron-overlay-closed': 'addChild'
       },
@@ -94,20 +100,6 @@
       },
 
       _treeUpdated: function (changeRecord) {
-        var path = changeRecord.path;
-        var node = this.querySelector('#' + path);
-        if(!node) {
-          var el = document.createElement('binary-node');
-          var pathes = path.split('.');
-          var lefts = this.countOccurrences(pathes, 'left');
-          var rights = this.countOccurrences(pathes, 'right');;
-          el.id = path;
-          el.value = changeRecord.value.value;
-          var horizOffset = -25 + rights * 75 - lefts * 75;
-          el.style.left = 'calc(50% + ' + horizOffset + 'px)';
-          el.style.top = (pathes.length - 1) * 50 +'px';
-          this.$.nodeContainer.appendChild(el);
-        }
         this.computeCompletness();
       },
 
@@ -124,13 +116,28 @@
       addChild: function (e) {
         if(e.detail.confirmed && this._value !== '') {
           this._parent[this._side] = true;
+
+          var y = this._parent.y + 50;
+          var parentX = this._parent.x;
+          var x = (this._side === 'left') ? parentX - 50 : parentX + 50;
+
           var path = this._parent.id + '.' + this._side;
-          console.log(path);
           this.set(path, {
             value: this._value,
             right: null,
             left: null
           });
+
+          var el = document.createElement('binary-node');
+
+          el.id = path;
+          el.value = this._value;
+
+          el.x = x;
+          el.y = y;
+
+          this.$.nodeContainer.appendChild(el);
+          this.repaintConnections();
         } else {
           if(this._value === '' && e.detail.confirmed)
             this.$.noVal.show();
@@ -144,6 +151,72 @@
             result++;
         }
         return result;
+      },
+
+      _onResize: function (e) {
+        var canvas = this.$.connections;
+        var target = canvas.parentNode.parentNode.parentNode.parentNode.getBoundingClientRect();
+        if(target) {
+          canvas.width = target.width;
+          canvas.height = target.height;
+        }
+        this.repaintConnections();
+      },
+
+      repaintConnections: function() {
+        var nodes = this.querySelectorAll('binary-node');
+        var canvas = this.$.connections;
+        var ctx = canvas.getContext('2d');
+        var width = canvas.width;
+        var halfW = width / 2;
+
+        ctx.clearRect(0 , 0, canvas.width, canvas.height);
+
+        for(var i=0; i<nodes.length; i++) {
+          var id = nodes[i].id;
+          var node = this.get(id);
+          var x = nodes[i].x;
+          var y = nodes[i].y;
+          if(node.right) {
+            var childPath = id + '.right';
+            var child = this.getElementById(nodes, childPath);
+            var cX = child.x;
+            var cY = child.y;
+
+            ctx.beginPath();
+            ctx.moveTo(x + 15 + halfW, y + 44);
+            ctx.lineTo(cX + halfW, cY + 10);
+            ctx.stroke();
+          }
+          if(node.left) {
+            var childPath = id + '.left';
+            var child = this.getElementById(nodes, childPath);
+            var cX = child.x;
+            var cY = child.y;
+            
+            ctx.beginPath();
+            ctx.moveTo(x + 11 - 25 + halfW, y + 44);
+            ctx.lineTo(cX + halfW, cY + 10);
+            ctx.stroke();
+          }
+        }
+      },
+
+      getElementById: function(base, id) {
+        for(var i=0; i< base.length; i++) {
+          if(base[i].id === id)
+            return base[i];
+        }
+        return null;
+      },
+
+      attached: function() {
+        window.addEventListener('resize', this._onResize.bind(this));
+        this._onResize();
+      },
+
+      detached: function() {
+        window.removeEventListener('resize', this._onResize.bind(this));
       }
     });
   </script>
