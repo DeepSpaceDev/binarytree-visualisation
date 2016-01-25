@@ -19,8 +19,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-fab/paper-fab.html">
+<link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="binary-tree.html">
 <link rel="import" href="binary-node.html">
+
+<link rel="stylesheet" type="text/css" href="main.css">
 
 <!--
 An element for visualising a binary tree and perform different operations on it.
@@ -41,6 +44,16 @@ Example:
         width: 100%;
         height: 100%;
         box-sizing: border-box;
+        --paper-header-panel-body {
+          background: #E0E0E0;
+        }
+        --primary-color: #FBC02D;
+        --dark-primary-color: #FBC02D;
+        --light-primary-color: #FFF9C4;
+
+        --accent-color: #00BCD4;
+
+        --default-primary-color: var(--primary-color);
       }
       paper-dialog {
         padding: 16px;
@@ -51,7 +64,7 @@ Example:
         right: 16px;
       }
       section {
-        width: 100%;
+        width: calc(100% + 16px)
       }
     </style>
     <paper-toast id="noVal" text="Please provide an value"></paper-toast>
@@ -68,7 +81,7 @@ Example:
       </div>
     </paper-dialog>
 
-    <paper-drawer-panel force-narrow>
+    <paper-drawer-panel>
       <paper-header-panel drawer>
         <paper-toolbar>
           <paper-icon-button 
@@ -77,7 +90,34 @@ Example:
             paper-drawer-toggle>
           </paper-icon-button>
         </paper-toolbar>
-        <div> Legende ... </div>
+        <paper-item>
+          <canvas id="root" width="48" height="48" item-icon></canvas>
+          <div>Root</div>
+        </paper-item>
+        <paper-item>
+          <canvas id="node" width="48" height="48" item-icon></canvas>
+          <div>Node</div>
+        </paper-item>
+        <paper-item>
+          <canvas id="branch" width="48" height="48" item-icon></canvas>
+          <div>Branch</div>
+        </paper-item>
+        <paper-item>
+          <canvas id="parent" width="48" height="48" item-icon></canvas>
+          <div>Parent</div>
+        </paper-item>
+        <paper-item>
+          <canvas id="child" width="48" height="48" item-icon></canvas>
+          <div>Child</div>
+        </paper-item>
+        <paper-item>
+          <canvas id="sibling" width="48" height="48" item-icon></canvas>
+          <div>Sibbling</div>
+        </paper-item>
+        <paper-item>
+          <canvas id="leaf" width="48" height="48" item-icon></canvas>
+          <div>Leaf</div>
+        </paper-item>
       </paper-header-panel>
       <paper-header-panel main>
         <paper-toolbar>
@@ -93,6 +133,7 @@ Example:
     <paper-fab icon="add" on-tap="addTree"></paper-fab>
   </template>
 
+  <script type="text/javascript" src="main.js"></script>
   <script>
     Polymer({
       is: 'binarytree-visualisation',
@@ -103,6 +144,16 @@ Example:
 
       listeners: {
         'iron-overlay-closed': '_addTree'
+      },
+
+      attached: function() {
+        drawRoot(this.$.root);
+        drawNode(this.$.node);
+        drawBranch(this.$.branch);
+        drawParent(this.$.parent);
+        drawChild(this.$.child);
+        drawSibling(this.$.sibling);
+        drawLeaf(this.$.leaf);
       },
 
       addTree: function() {
