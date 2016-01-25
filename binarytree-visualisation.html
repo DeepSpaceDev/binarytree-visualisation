@@ -60,8 +60,8 @@ Example:
       }
       paper-fab {
         position: absolute;
-        bottom: 16px;
-        right: 16px;
+        bottom: 32px;
+        right: 32px;
       }
       section {
         width: calc(100% + 16px)
@@ -112,7 +112,7 @@ Example:
         </paper-item>
         <paper-item>
           <canvas id="sibling" width="48" height="48" item-icon></canvas>
-          <div>Sibbling</div>
+          <div>Sibling</div>
         </paper-item>
         <paper-item>
           <canvas id="leaf" width="48" height="48" item-icon></canvas>
@@ -164,11 +164,9 @@ Example:
         if(e.target.id === 'addTreeDialog') {
           if(e.detail.confirmed && this._value !== '') {
             var tree = document.createElement('binary-tree');
-            console.log(tree.tree);
             tree.$.tree.value = this._value;
             tree.tree.value = this._value;
             tree.name = this._name;
-            console.log(tree.tree);
             this.$.treeContainer.appendChild(tree);
             this._value = '';
             this._name = '';

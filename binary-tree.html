@@ -92,15 +92,48 @@
       observers: ['_treeUpdated(tree.*)'],
 
       computeCompletness: function () {
-        //TODO
-        this.complete = false;
-        this.full = false;
-        if(this.full)
-          this.completness = 'full';
-        else if(this.complete)
+        var d = this.getMaxDepth(this.tree);
+        console.log(d);
+        var children = this.getChildrenCount(this.tree);
+        console.log(children);
+        var computedChildren = Math.pow(2, d) - 1;
+        console.log(computedChildren);
+
+        if(children === computedChildren)
           this.completness = 'complete';
+        else if(this._isFull(this.tree))
+          this.completness = 'full';
         else
           this.completness = 'Not complete or full';
+      },
+
+      getMaxDepth: function(node) {
+        if(node) {
+          var lDepth = this.getMaxDepth(node.left);
+          var rDepth = this.getMaxDepth(node.right);
+
+          if(lDepth > rDepth)
+            return 1 + lDepth;
+          return 1 + rDepth;
+        } else {
+          return 0;
+        }
+      },
+
+      getChildrenCount: function(node) {
+        if(node)
+          return 1 + this.getChildrenCount(node.right) + this.getChildrenCount(node.left);
+        return 0;
+      },
+
+      _isFull: function(node) {
+        if(!node.left && !node.right)
+          return true;
+        if(node.left && !node.right)
+          return false;
+        if(node.right && !node.left)
+          return false;
+        return this._isFull(node.left) && this._isFull(node.right);
       },
 
       _treeUpdated: function (changeRecord) {
