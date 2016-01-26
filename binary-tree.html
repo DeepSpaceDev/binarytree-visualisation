@@ -60,10 +60,22 @@
       is: 'binary-tree',
 
       properties: {
+        /**
+         * Name of the tree
+         * @attribute name
+         * @type String
+         */
         name: {
           type: String,
           value: ''
         },
+        /**
+         * The complete tree structure
+         * Each node has a `node`, a `left` and a `right` attribute,
+         * where `right` and `left` are `Objects` (with same attributes) themself
+         * @attribute tree
+         * @type Object
+         */
         tree: {
           type: Object,
           value: function () {
@@ -73,10 +85,20 @@
             }
           }
         },
+        /**
+         * If the tree is complete
+         * @attribute complete
+         * @type Boolean
+         */
         complete: {
           type: Boolean,
           value: false
         },
+        /**
+         * If the tree is full
+         * @attribute full
+         * @type Boolean
+         */
         full: {
           type: Boolean,
           value: false
@@ -89,24 +111,54 @@
         'iron-overlay-closed': 'addChild'
       },
 
-      observers: ['_treeUpdated(tree.*)'],
+      observers: [
+        '_treeUpdated(tree.*)',
+        '_computeCompletnessString(full, complete)'
+      ],
 
-      computeCompletness: function () {
-        var d = this.getMaxDepth(this.tree);
-        console.log(d);
-        var children = this.getChildrenCount(this.tree);
-        console.log(children);
-        var computedChildren = Math.pow(2, d) - 1;
-        console.log(computedChildren);
-
-        if(children === computedChildren)
+      /**
+       * Set's the string indicating the completness of the tree
+       * @param {Boolean} full If the tree is full
+       * @param {Boolean} complete If the tree is complete
+       */
+      _computeCompletnessString: function(full, complete) {
+        if(complete)
           this.completness = 'complete';
-        else if(this._isFull(this.tree))
+        else if(full)
           this.completness = 'full';
         else
           this.completness = 'Not complete or full';
       },
 
+      /**
+       * Checks whether the tree is `complete`, `full` or `neither`
+       * @return An String indicating the completness
+       */
+      computeCompletness: function () {
+        var d = this.getMaxDepth(this.tree);
+        var children = this.getChildrenCount(this.tree);
+        var computedChildren = Math.pow(2, d) - 1;
+
+        if(children === computedChildren) {
+          this.complete = true;
+          this.full = true;
+          return 'complete';
+        } else if(this._isFull(this.tree)) {
+          this.complete = false;
+          this.full = true;
+          return 'full';
+        } else {
+          this.complete = false;
+          this.full = false;
+          return 'neither';
+        }
+      },
+
+      /**
+       * Get's the max depth of a given node
+       * @param {Object} node The node object to get the max depth from
+       * @return The 'max depth of the node' + 1
+       */
       getMaxDepth: function(node) {
         if(node) {
           var lDepth = this.getMaxDepth(node.left);
@@ -120,12 +172,22 @@
         }
       },
 
+      /**
+       * Get's the total number of children
+       * @param {Object} node The node object to get the total children number from
+       * @return The total number of children
+       */
       getChildrenCount: function(node) {
         if(node)
           return 1 + this.getChildrenCount(node.right) + this.getChildrenCount(node.left);
         return 0;
       },
 
+      /**
+       * Check's if each node has to children or none
+       * @param {Object} node The node object to check for
+       * @return If the tree is full
+       */
       _isFull: function(node) {
         if(!node.left && !node.right)
           return true;
@@ -140,6 +202,10 @@
         this.computeCompletness();
       },
 
+      /**
+       * Callback for the addChild Event
+       * @param {Object} e e.detail.left/.right defines if node should be added left/right
+       */
       _onAddChild: function(e) {
         this._parent = e.target;
         if(e.detail.left) 
@@ -150,6 +216,10 @@
         this.$.selectValue.open();
       },
 
+      /**
+       * Callback for the addNode Dialog, adds a child
+       * @param {Object} e 
+       */
       addChild: function (e) {
         if(e.detail.confirmed && this._value !== '') {
           this._parent[this._side] = true;
@@ -164,7 +234,7 @@
             right: null,
             left: null
           });
-
+          // Create element and assign values to it
           var el = document.createElement('binary-node');
 
           el.id = path;
@@ -177,10 +247,17 @@
           this.repaintConnections();
         } else {
           if(this._value === '' && e.detail.confirmed)
+            // Show warning for missing node value
             this.$.noVal.show();
         }
       },
 
+      /**
+       * Count the occurrences of type type in an array
+       * @param {Array} array The array to search in
+       * @param type The variable to search in the array
+       * @return The occurrences of the type
+       */
       countOccurrences: function(array, type) {
         var result = 0;
         for(var i = 0; i< array.length; i++) {
@@ -190,6 +267,11 @@
         return result;
       },
 
+      /**
+       * Callback for the resize callback
+       * Resizes the canvas height and width
+       * @param {Object} e 
+       */
       _onResize: function (e) {
         var nodes = this.querySelectorAll('binary-node');
         var maxY = 0;
@@ -211,6 +293,9 @@
         }
       },
 
+      /**
+       * Repaints all branches between the nodes
+       */
       repaintConnections: function() {
         this._onResize();
         var nodes = this.querySelectorAll('binary-node');
@@ -253,6 +338,12 @@
         }
       },
 
+      /**
+       * Get's an element by id in the base array
+       * @param {Array} base The array to search in for the suitable id
+       * @param {String} id The id to search for
+       * @return The node with the id 
+       */
       getElementById: function(base, id) {
         for(var i=0; i< base.length; i++) {
           if(base[i].id === id)

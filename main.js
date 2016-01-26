@@ -1,3 +1,7 @@
+/**
+ * Draw's the root icon the the canvas
+ * @param {Canvas} canvas The canvas to draw to
+ */
 function drawRoot(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
@@ -16,7 +20,10 @@ function drawRoot(canvas) {
 	ctx.lineTo(36, 33);
 	ctx.stroke();
 }
-
+/**
+ * Draw's the node icon the the canvas
+ * @param {Canvas} canvas The canvas to draw to
+ */
 function drawNode(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
@@ -25,7 +32,10 @@ function drawNode(canvas) {
 	ctx.arc(24, 24, 8, 2 * Math.PI, false);
 	ctx.stroke();
 }
-
+/**
+ * Draw's the branch icon the the canvas
+ * @param {Canvas} canvas The canvas to draw to
+ */
 function drawBranch(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
@@ -35,7 +45,10 @@ function drawBranch(canvas) {
 	ctx.lineTo(32, 32);
 	ctx.stroke();
 }
-
+/**
+ * Draw's the parent icon the the canvas
+ * @param {Canvas} canvas The canvas to draw to
+ */
 function drawParent(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
@@ -49,7 +62,10 @@ function drawParent(canvas) {
 	ctx.lineTo(24, 36);
 	ctx.stroke();
 }
-
+/**
+ * Draw's the child icon the the canvas
+ * @param {Canvas} canvas The canvas to draw to
+ */
 function drawChild(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
@@ -68,7 +84,10 @@ function drawChild(canvas) {
 	ctx.lineTo(24, 41);
 	ctx.stroke();
 }
-
+/**
+ * Draw's the sibling icon the the canvas
+ * @param {Canvas} canvas The canvas to draw to
+ */
 function drawSibling(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
@@ -95,7 +114,10 @@ function drawSibling(canvas) {
 	ctx.arc(38, 32, 4, 2 * Math.PI, false);
 	ctx.stroke();
 }
-
+/**
+ * Draw's the leaf icon the the canvas
+ * @param {Canvas} canvas The canvas to draw to
+ */
 function drawLeaf(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
