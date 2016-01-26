@@ -69,9 +69,20 @@ Example:
       section {
         width: calc(100% + 16px)
       }
+      #toast-button {
+        color: #D2FD00;
+        margin: 10px;
+        right: 8px;
+        position: absolute;
+        top: 50%;
+        margin-top: -8px;
+      }
     </style>
     <paper-toast id="noVal" text="Please provide an value"></paper-toast>
     <paper-toast id="noTree" text="No tree found to traverse"></paper-toast>
+    <paper-toast id="traverseResult" class="fit-bottom" duration="0">
+      <span role="button" id="toast-button" tabindex="0" on-tap="_closeResult">OK</span>
+    </paper-toast>
 
     <paper-dialog id="addTreeDialog" modal>
       <h2>Please insert a value and a name for the root node</h2>
@@ -199,6 +210,9 @@ Example:
           default: var result = this.postOrder(tree);
         }
         console.log(result);
+        this.$.traverseResult.text = 
+          mode.charAt(0).toUpperCase() + mode.slice(1) + ': ' + result.join(', ');
+        this.$.traverseResult.show();
       },
 
       attached: function() {
@@ -250,27 +264,41 @@ Example:
       },
 
       searchForElement: function (value) {
-        return this.inOrder(this.tree, value);
+        
       },
 
       preOrder: function(node) {
-
+        var result = [];
+        result.push(node.value);
+        if(node.left)
+          result = result.concat(this.preOrder(node.left));
+        if(node.right) 
+          result = result.concat(this.preOrder(node.right));
+        return result;
       },
 
       inOrder: function(node) {
-        /*var result = null;
-
-        if(node.left != null)
-          result = this.inOrder(node.left, value);
-        if(node.value == value)
-          return node;
-        if(node.right != null)
-          result = this.inOrder(node.right, value);
-        return result;*/
+        var result = [];
+        if(node.left)
+          result = result.concat(this.inOrder(node.left));
+        result.push(node.value);
+        if(node.right)
+          result = result.concat(this.inOrder(node.right));
+        return result;
       },
 
       postOrder: function(node) {
+        var result = [];
+        if(node.left)
+          result = result.concat(this.postOrder(node.left));
+        if(node.right)
+          result = result.concat(this.postOrder(node.right));
+        result.push(node.value);
+        return result;
+      },
 
+      _closeResult: function() {
+        this.$.traverseResult.hide();
       }
     });
   </script>

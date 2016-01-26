@@ -262,12 +262,12 @@
       },
 
       attached: function() {
-        window.addEventListener('resize', this._onResize.bind(this));
+        window.addEventListener('resize', this.repaintConnections.bind(this));
         this._onResize();
       },
 
       detached: function() {
-        window.removeEventListener('resize', this._onResize.bind(this));
+        window.removeEventListener('resize', this.repaintConnections.bind(this));
       }
     });
   </script>
