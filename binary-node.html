@@ -162,9 +162,11 @@
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // Draw Node
-        ctx.beginPath();
-        ctx.arc(25, 25, 15, 0, 2 * Math.PI, false);
-        ctx.stroke();
+
+        handDrawCircle(ctx, 25, 25, 15, 2);
+        // ctx.beginPath();
+        // ctx.arc(25, 25, 15, 0, 2 * Math.PI, false);
+        // tx.stroke();
         // Draw right node add button
         ctx.beginPath();
         ctx.arc(11, 39, 5, 0, 2 * Math.PI, false);
@@ -174,8 +176,12 @@
         ctx.arc(39, 39, 5, 0, 2 * Math.PI, false);
         ctx.stroke();
         // Draw text
-        if(this.value && this.value !== '')
-          ctx.strokeText(this.value, 22, 28);
+        if(this.value && this.value !== '') {
+          ctx.font = 'Roboto 10px';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.strokeText(this.value, 25, 25);
+        }
       }
     });
   </script>
