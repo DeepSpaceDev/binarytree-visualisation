@@ -18,6 +18,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../paper-radio-button/paper-radio-button.html">
@@ -123,31 +124,52 @@ Example:
         </paper-toolbar>
         <paper-item>
           <canvas id="root" width="48" height="48" item-icon></canvas>
-          <div>Root</div>
+          <div>
+            Root
+            <paper-tooltip position="right">The only node in a finite tree without parent</paper-tooltip>
+          </div>
         </paper-item>
         <paper-item>
           <canvas id="node" width="48" height="48" item-icon></canvas>
-          <div>Node</div>
+          <div>
+            Node
+            <paper-tooltip position="right">A container for a specific value</paper-tooltip>
+          </div>
         </paper-item>
         <paper-item>
           <canvas id="branch" width="48" height="48" item-icon></canvas>
-          <div>Branch</div>
+          <div>
+            Branch
+            <paper-tooltip position="right">A connection between two nodes</paper-tooltip>
+          </div>
         </paper-item>
         <paper-item>
           <canvas id="parent" width="48" height="48" item-icon></canvas>
-          <div>Parent</div>
+          <div>
+            Parent
+            <paper-tooltip position="right">A node extending to another node</paper-tooltip>
+          </div>
         </paper-item>
         <paper-item>
           <canvas id="child" width="48" height="48" item-icon></canvas>
-          <div>Child</div>
+          <div>
+            Child
+            <paper-tooltip position="right">A node extending from another node</paper-tooltip>
+          </div>
         </paper-item>
         <paper-item>
           <canvas id="sibling" width="48" height="48" item-icon></canvas>
-          <div>Sibling</div>
+          <div>
+            Sibling
+            <paper-tooltip position="right">Two nodes connecting to the same parent</paper-tooltip>
+          </div>
         </paper-item>
         <paper-item>
           <canvas id="leaf" width="48" height="48" item-icon></canvas>
-          <div>Leaf</div>
+          <div>
+            Leaf
+            <paper-tooltip position="right">A node with no children</paper-tooltip>
+          </div>
         </paper-item>
       </paper-header-panel>
       <paper-header-panel main>
