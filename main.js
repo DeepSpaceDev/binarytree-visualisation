@@ -3,23 +3,23 @@ function handDrawCircle(ctx, cx, cy, r, rounds, callback) {
     rounds = rounds ? rounds : 3.0; // can be fractional, ie. 2.5
     
     var x, y,
-        /// try to find the sweet-spot here:
-        tol = Math.random() * (r * 0.03) + (r * 0.025),
-        dx = Math.random() * tol * 0.75,
-        dy = Math.random() * tol * 0.75,
-        /// and here:
-        ix = (Math.random() - 1) * (r * 0.2 * 0.022),
-        iy = (Math.random() - 1) * (r * 0.15 * 0.022),
-        rx = r + Math.random() * tol,
-        ry = (r + Math.random() * tol) * 0.8,
-        a = 0,
-        ad = 3,
-        i = 0,
-        start = Math.random() + 50,
-        tot = 360 * rounds + Math.random() * 50 - 100,
-        deg2rad = Math.PI / 180,
-        points = [],
-        rotate = Math.random() * 0.5;
+    /// try to find the sweet-spot here:
+    tol = Math.random() * (r * 0.03) + (r * 0.025),
+    dx = Math.random() * tol * 0.75,
+    dy = Math.random() * tol * 0.75,
+    /// and here:
+    ix = (Math.random() - 1) * (r * 0.2 * 0.022),
+    iy = (Math.random() - 1) * (r * 0.15 * 0.022),
+    rx = r + Math.random() * tol,
+    ry = (r + Math.random() * tol) * 0.8,
+    a = 0,
+    ad = 3,
+    i = 0,
+    start = Math.random() + 50,
+    tot = 360 * rounds + Math.random() * 50 - 100,
+    deg2rad = Math.PI / 180,
+    points = [],
+    rotate = Math.random() * 0.5;
 
     ctx.save();
     ctx.translate(cx, cy);
@@ -42,6 +42,8 @@ function handDrawCircle(ctx, cx, cy, r, rounds, callback) {
     }
 
     i = 2;
+
+	ctx.strokeStyle = '#7F7F7F';
 
     draw();
 
@@ -76,6 +78,7 @@ function handDrawCircle(ctx, cx, cy, r, rounds, callback) {
 function drawRoot(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
+	ctx.strokeStyle = '#7F7F7F';
 
 	ctx.beginPath();
 	ctx.arc(24, 21, 8, 2 * Math.PI, false);
@@ -98,6 +101,7 @@ function drawRoot(canvas) {
 function drawNode(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
+	ctx.strokeStyle = '#7F7F7F';
 
 	ctx.beginPath();
 	ctx.arc(24, 24, 8, 2 * Math.PI, false);
@@ -110,6 +114,7 @@ function drawNode(canvas) {
 function drawBranch(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
+	ctx.strokeStyle = '#7F7F7F';
 
 	ctx.beginPath();
 	ctx.moveTo(16, 16);
@@ -123,6 +128,7 @@ function drawBranch(canvas) {
 function drawParent(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
+	ctx.strokeStyle = '#7F7F7F';
 
 	ctx.beginPath();
 	ctx.arc(24, 19, 8, 2 * Math.PI, false);
@@ -140,6 +146,7 @@ function drawParent(canvas) {
 function drawChild(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
+	ctx.strokeStyle = '#7F7F7F';
 
 	ctx.beginPath();
 	ctx.moveTo(24, 8);
@@ -162,6 +169,7 @@ function drawChild(canvas) {
 function drawSibling(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
+	ctx.strokeStyle = '#7F7F7F';
 
 	ctx.beginPath();
 	ctx.arc(24, 19, 4, 2 * Math.PI, false);
@@ -192,6 +200,7 @@ function drawSibling(canvas) {
 function drawLeaf(canvas) {
 	var ctx = canvas.getContext('2d');
 	ctx.lineWidth = 2;
+	ctx.strokeStyle = '#7F7F7F';
 
 	ctx.beginPath();
 	ctx.moveTo(24, 11);

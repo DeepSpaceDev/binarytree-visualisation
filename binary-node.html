@@ -69,6 +69,7 @@
       },
 
       listeners: {
+        'contextmenu': '_onContextMenu',
         'click': '_handleClick',
         'track': '_onTrack'
       },
@@ -147,6 +148,14 @@
       _translationChanged: function(x, y) {
         this.style.left = 'calc(50% - 25px + ' + x + 'px)';
         this.style.top = y + 'px';
+      },
+
+      _onContextMenu: function(e) {
+        e.preventDefault();
+        this.fire('nodeContext', {
+          x: e.clientX,
+          y: e.clientY
+        });
       },
 
       attached: function () {
