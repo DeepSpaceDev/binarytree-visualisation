@@ -317,6 +317,7 @@
        */
       _deleteSubtree: function() {
         var path = this._contextTarget.id;
+        this.$.context.style.visibility = 'collapse';
         this.deleteSubtree(path);
       },
 
