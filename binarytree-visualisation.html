@@ -226,7 +226,8 @@ Example:
       },
 
       listeners: {
-        'iron-overlay-closed': '_onIronOverlayClosed'
+        'iron-overlay-closed': '_onIronOverlayClosed',
+        'deleteTree': '_deleteTree'
       },
 
       /**
@@ -289,6 +290,10 @@ Example:
        */
       addTree: function() {
         this.$.addTreeDialog.open();
+      },
+
+      _deleteTree: function(e) {
+        this.$.treeContainer.removeChild(e.target);
       },
 
       _onIronOverlayClosed: function (e) {
