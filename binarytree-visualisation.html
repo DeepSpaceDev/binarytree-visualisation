@@ -106,7 +106,7 @@ Example:
     <paper-dialog id="addTreeDialog" modal>
       <h2>Please insert a value and a name for the root node</h2>
       <paper-dialog-scrollable>
-        <paper-input label="name" value="{{_name}}" required></paper-input>
+        <paper-input label="name" value="{{_name}}" autofocus required></paper-input>
         <paper-input label="value" value="{{_value}}" required></paper-input>
       </paper-dialog-scrollable>
       <div class="buttons">
@@ -118,7 +118,7 @@ Example:
     <paper-dialog id="traverseDialog" modal>
       <h2>Please select some properties for traversing:</h2>
       <paper-dialog-scrollable>
-        <paper-input label="Tree" value="{{_treeToTrav}}"></paper-input>
+        <paper-input label="Tree" value="{{_treeToTrav}}" autofocus></paper-input>
         <paper-radio-group selected="{{_travMode}}">
           <paper-radio-button name="pre">Pre-Order</paper-radio-button>
           <paper-radio-button name="in">In-Order</paper-radio-button>

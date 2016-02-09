@@ -66,7 +66,7 @@
     <paper-dialog id="selectValue" modal>
       <h2>Please insert a value for the node</h2>
       <paper-dialog-scrollable>
-        <paper-input label="value" value="{{_value}}" required></paper-input>
+        <paper-input label="value" value="{{_value}}" autofocus required></paper-input>
       </paper-dialog-scrollable>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
@@ -288,6 +288,7 @@
         else
           this._side = 'right';
         this._value = '';
+        this._ordered = false;
         this.$.selectValue.open();
       },
 
@@ -297,19 +298,59 @@
        */
       addChild: function (e) {
         if(e.detail.confirmed && this._value !== '') {
-          this._parent[this._side] = true;
+          if(this._ordered) {
+            this.addNodeOrdered(this._path, this._value);
+          } else {
+            this._parent[this._side] = true;
 
-          var path = this._parent.id + '.' + this._side;
-          this.set(path, {
-            value: this._value,
-            right: null,
-            left: null
-          });
+            var path = this._parent.id + '.' + this._side;
+            this.set(path, {
+              value: this._value,
+              right: null,
+              left: null
+            });
+          }
         } else {
           if(this._value === '' && e.detail.confirmed)
             // Show warning for missing node value
             this.$.noVal.show();
         }
+      },
+
+      _addNodeOrdered: function() {
+        var path = this._contextTarget.id;
+        this.$.context.style.visibility = 'collapse';
+        this._ordered = true;
+        this._path = path;
+        this._value = '';
+        this.$.selectValue.open();
+      },
+
+      addNodeOrdered: function(path, value) {
+        var node = this.get(path);
+
+        if(this.compareNode(node.value, value) > 0) {
+          if(node.left == null) {
+            this.set(path + '.left', {
+              value: this._value,
+              right: null,
+              left: null
+            });
+          } else {
+            this.addNodeOrdered(path + '.left', value);
+          }
+        } else {
+          if(node.right == null) {
+            this.set(path + '.right', {
+              value: this._value,
+              right: null,
+              left: null
+            });
+          } else {
+            this.addNodeOrdered(path + '.right', value);
+          }
+        }
+
       },
 
       /**
