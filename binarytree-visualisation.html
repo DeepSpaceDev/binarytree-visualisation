@@ -118,7 +118,7 @@ Example:
     <paper-dialog id="traverseDialog" modal>
       <h2>Please select some properties for traversing:</h2>
       <paper-dialog-scrollable>
-        <paper-input label="Tree" value="{{_treeToTrav}}" autofocus></paper-input>
+        <!-- <paper-input label="Tree" value="{{_treeToTrav}}" autofocus></paper-input> -->
         <paper-radio-group selected="{{_travMode}}">
           <paper-radio-button name="pre">Pre-Order</paper-radio-button>
           <paper-radio-button name="in">In-Order</paper-radio-button>
@@ -133,13 +133,13 @@ Example:
 
     <feedback-dialog id="feedbackDialog" repo="binarytree-visualisation"></feedback-dialog>
 
-    <paper-drawer-panel>
+    <paper-drawer-panel id="drawer">
       <paper-header-panel drawer>
         <paper-toolbar>
           <paper-icon-button 
             icon="arrow-back" 
             style="color: white;"
-            paper-drawer-toggle>
+            on-tap="closeDrawer">
           </paper-icon-button>
         </paper-toolbar>
         <paper-item>
@@ -202,7 +202,7 @@ Example:
         <paper-toolbar>
           <paper-icon-button icon="view-list" on-tap="openDrawer" paper-drawer-toggle>
           </paper-icon-button>
-          <paper-button on-tap="requestTraverse">Traverse</paper-button>
+          <!-- <paper-button on-tap="requestTraverse">Traverse</paper-button> -->
         </paper-toolbar>
         <section id="treeContainer">
           
@@ -227,21 +227,22 @@ Example:
 
       listeners: {
         'iron-overlay-closed': '_onIronOverlayClosed',
-        'deleteTree': '_deleteTree'
+        'deleteTree': '_deleteTree',
+        'traverseSubtree': '_traverseSubtree'
       },
 
       /**
        * Opens a dialog for selecting some options for traversing a tree.
        */
       requestTraverse: function() {
-        var treeContainer = this.$.travTrees;
-        var trees = this.querySelectorAll('binary-tree');
+        // var treeContainer = this.$.travTrees;
+        // var trees = this.querySelectorAll('binary-tree');
 
         // Check if there are trees
-        if(trees.length === 0) {
+        /*if(trees.length === 0) {
           this.$.noTree.show();
           return;
-        }
+        }*/
 
         /*treeContainer.selected = trees[0].name;
 
@@ -253,6 +254,11 @@ Example:
         }*/
 
         this.$.traverseDialog.open();
+      },
+
+      _traverseSubtree: function(e) {
+        this._traverseNode = e.detail.node;
+        this.requestTraverse();
       },
 
       /**
@@ -321,16 +327,16 @@ Example:
             var trees = this.querySelectorAll('binary-tree');
 
             // Search for tree with specified value
-            for(var i=0; i<trees.length; i++) {
-              if(trees[i].name === this._treeToTrav) {
+            // for(var i=0; i<trees.length; i++) {
+              // if(trees[i].name === this._treeToTrav) {
                 // Traverse
-                this.traverse(trees[i].tree, this._travMode);
+                this.traverse(this._traverseNode, this._travMode);
                 // Reset dialog values
                 this._treeToTrav = '';
                 this._travMode = 'in';
                 return;
-              }
-            }
+              // }
+            // }
             // Reset dialog values
             this._treeToTrav = '';
             this._travMode = 'in';

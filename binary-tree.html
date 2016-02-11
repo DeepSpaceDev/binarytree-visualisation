@@ -49,6 +49,10 @@
     <paper-toast id="noVal" text="Please provide an value"></paper-toast>
 
     <paper-material id="context">
+      <paper-item on-tap="_traverseSubtree">
+        <iron-icon icon="filter-list" style="margin-right: 8px;"></iron-icon>
+        Traverse Subtree
+      </paper-item>
       <paper-item on-tap="_addNodeOrdered">
         <iron-icon icon="add" style="margin-right: 8px;"></iron-icon>
         Add Node ordered
@@ -331,6 +335,10 @@
 
         if(this.compareNode(node.value, value) > 0) {
           if(node.left == null) {
+            var nodes = this.querySelectorAll('binary-node');
+            var parent = this.getElementById(nodes, path);
+            console.log(parent);
+            parent.left = true;
             this.set(path + '.left', {
               value: this._value,
               right: null,
@@ -341,6 +349,8 @@
           }
         } else {
           if(node.right == null) {
+            var nodes = this.querySelectorAll('binary-node');
+            this.getElementById(nodes, path).right = true;
             this.set(path + '.right', {
               value: this._value,
               right: null,
@@ -351,6 +361,12 @@
           }
         }
 
+      },
+
+      _traverseSubtree: function() {
+        this.fire('traverseSubtree', {
+          node: this.get(this._contextTarget.id)
+        });
       },
 
       /**
@@ -559,6 +575,14 @@
             return;
           this.$.context.style.visibility = 'collapse';
         }
+      },
+
+      getParentApp: function() {
+        var parent = this;
+        while(parent.tagName !== 'BINARYTREE-VISUALISATION') {
+          parent = parent.parentNode;
+        }
+        return parent;
       },
 
       attached: function() {
