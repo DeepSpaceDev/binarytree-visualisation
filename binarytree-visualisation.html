@@ -139,7 +139,8 @@ Example:
           <paper-icon-button 
             icon="arrow-back" 
             style="color: white;"
-            on-tap="closeDrawer">
+            on-tap="closeDrawer"
+            paper-drawer-toggle>
           </paper-icon-button>
         </paper-toolbar>
         <paper-item>
@@ -405,10 +406,32 @@ Example:
 
       openDrawer: function() {
         this.$.drawer.forceNarrow = false;
+        this.notifyDrawerResize();
       },
 
       closeDrawer: function() {
         this.$.drawer.forceNarrow = true;
+        window.setTimeout(function() {
+          this.$.drawer.closeDrawer();
+        }.bind(this), 0);
+        this.notifyDrawerResize();
+      },
+
+      notifyDrawerResize: function() {
+        this._request = true;
+        window.requestAnimationFrame(this._notifyResize.bind(this));
+        window.setTimeout(function() {
+          this._request = false;
+        }.bind(this), 300);
+      },
+
+      _notifyResize: function() {
+        var trees = this.querySelectorAll('binary-tree');
+        for(var i=0; i<trees.length; i++) {
+          trees[i].fire('drawerChanged');
+        }
+        if(this._request)
+          window.requestAnimationFrame(this._notifyResize.bind(this));
       },
 
       /**
