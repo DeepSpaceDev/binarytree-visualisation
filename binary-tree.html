@@ -65,6 +65,18 @@
         <iron-icon icon="delete" style="margin-right: 8px;"></iron-icon>
         Delete Subtree
       </paper-item>
+      <paper-item on-tap="_copySubtree">
+        <iron-icon icon="content-copy" style="margin-right: 8px;"></iron-icon>
+        Copy Subtree
+      </paper-item>
+      <paper-item on-tap="_cutSubtree">
+        <iron-icon icon="content-cut" style="margin-right: 8px;"></iron-icon>
+        Cut Subtree
+      </paper-item>
+      <paper-item on-tap="_pasteSubtree">
+        <iron-icon icon="content-paste" style="margin-right: 8px;"></iron-icon>
+        Paste Subtree
+      </paper-item>
     </paper-material>
 
     <paper-dialog id="selectValue" modal>
@@ -233,9 +245,9 @@
 
       _treeUpdated: function (changeRecord) {
         this.computeCompletness();
+        // var nodes = this.querySelectorAll('binary-node');
+        // var node = changeRecord.value;
         console.log(changeRecord);
-        var nodes = this.querySelectorAll('binary-node');
-        var node = changeRecord.value;
         var path = changeRecord.path;
 
         // Remove Occurence of 'value'
@@ -243,16 +255,18 @@
         if(valOcc !== -1)
           path = path.substring(0, valOcc);
 
-        var pathElements = path.split('.');
+        /*var pathElements = path.split('.');
         var parentId = pathElements.splice(0, pathElements.length - 1).join('.');
-        var parent = this.getElementById(nodes, parentId);
+        var parent = this.getElementById(nodes, parentId);*/
 
         if(path === 'tree' && node == null) {
           this.fire('deleteTree');
           return;
         }
-        for(var i=0; i<nodes.length; i++) {
-          // if(nodes[i].id.search(path) !== -1) {
+
+        this.repaintSubtree(path);
+
+        /*for(var i=0; i<nodes.length; i++) {
           if(nodes[i].id === path) {
             if(node === null) {
               parent[pathElements[pathElements.length - 1]] = false;
@@ -276,9 +290,45 @@
           el.y = y;
 
           this.$.nodeContainer.appendChild(el);
-        }
+        }*/
 
         this.repaintConnections();
+      },
+
+      repaintSubtree: function(path) {
+        var nodes = this.querySelectorAll('binary-node');
+        var node = this.get(path);
+        var nodeElement = this.getElementById(nodes, path);
+        if(nodeElement) {
+          if(node == null && path !== 'tree') {
+            this.$.nodeContainer.removeChild(nodeElement);
+          } else {
+            nodeElement.value = node.value;
+          }
+        } else {
+          if(node.value != null) {
+            var pathElements = path.split('.');
+            var parentId = pathElements.splice(0, pathElements.length - 1).join('.');
+            var parent = this.getElementById(nodes, parentId);
+
+            var y = parent.y + 50;
+            var parentX = parent.x;
+            var x = (pathElements[pathElements.length - 1] === 'left') ? parentX - 50 : parentX + 50;
+            
+            var el = document.createElement('binary-node');
+            el.id = path;
+            el.value = node.value;
+            el.x = x;
+            el.y = y;
+
+            this.$.nodeContainer.appendChild(el);
+          }
+        }
+
+        if(this.getElementById(nodes, path + '.left') || (node && node.left))
+          this.repaintSubtree(path + '.left');
+        if(this.getElementById(nodes, path + '.right') || (node && node.right))
+          this.repaintSubtree(path + '.right');
       },
 
       /**
@@ -337,7 +387,6 @@
           if(node.left == null) {
             var nodes = this.querySelectorAll('binary-node');
             var parent = this.getElementById(nodes, path);
-            console.log(parent);
             parent.left = true;
             this.set(path + '.left', {
               value: this._value,
@@ -364,6 +413,7 @@
       },
 
       _traverseSubtree: function() {
+        this.$.context.style.visibility = 'collapse';
         this.fire('traverseSubtree', {
           node: this.get(this._contextTarget.id)
         });
@@ -416,6 +466,47 @@
           this.set(path + '.value', value);
           this.deleteNode(minPath);
         }
+      },
+
+      _copySubtree: function() {
+        var path = this._contextTarget.id;
+        this.$.context.style.visibility = 'collapse';
+        this.copySubtree(path);
+      },
+
+      copySubtree: function(path) {
+        var node = this.get(path);
+        var jsonNode = JSON.stringify(node);
+        setCookie('clipboard', jsonNode, 100);
+      },
+
+      _cutSubtree: function() {
+        var path = this._contextTarget.id;
+        this.$.context.style.visibility = 'collapse';
+        this.cutSubtree(path);
+      },
+
+      cutSubtree: function(path) {
+        var node = this.get(path);
+        var jsonNode = JSON.stringify(node);
+        setCookie('clipboard', jsonNode, 100);
+        this.set(path, null);
+      },
+
+      _pasteSubtree: function() {
+        var path = this._contextTarget.id;
+        this.$.context.style.visibility = 'collapse';
+        this.pasteSubtree(path);
+      },
+
+      pasteSubtree: function(path) {
+        var clipboard = getCookie('clipboard');
+        var node = JSON.parse(clipboard);
+        var parentNode = this.get(path);
+        if(this.compareNode(parentNode.value, node.value) > 0)
+          this.set(path + '.left', node);
+        else
+          this.set(path + '.right', node);
       },
 
       findMin: function(node) {
@@ -487,9 +578,8 @@
       /**
        * Callback for the resize callback
        * Resizes the canvas height and width
-       * @param {Object} e 
        */
-      _onResize: function (e) {
+      _onResize: function () {
         var nodes = this.querySelectorAll('binary-node');
         var maxY = 0;
 
