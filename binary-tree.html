@@ -24,7 +24,9 @@
         background-color: rgba(255, 255, 255, 0.2);
       }
       #nodeContainer {
-        width: 100%;
+        margin: 8px;
+        width: calc(100% - 32px);
+        background: white;
         height: 50px;
       }
       #connections {
@@ -90,14 +92,14 @@
       </div>
     </paper-dialog>
 
-    <section id="nodeContainer" class="unselectable" style$="[[_height]]">
+    <paper-material id="nodeContainer" class="unselectable" style$="[[_height]]">
       <canvas id="connections"></canvas>
       <div id="name">
         <paper-input label="name" value="{{name}}"></paper-input>
       </div>
       <div id="completness">[[completness]]</div>
       <binary-node id="tree" x="0" y="0"></binary-node>
-    </section>
+    </paper-material>
   </template>
   <script>
     Polymer({
