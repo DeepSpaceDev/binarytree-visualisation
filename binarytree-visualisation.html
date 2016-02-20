@@ -32,6 +32,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../paper-fab/paper-fab.html">
 <link rel="import" href="../paper-item/paper-item.html">
 
+<script src="../clipboard.js/clipboard.js"></script>
+
 <link rel="import" href="binary-tree.html">
 <link rel="import" href="binary-node.html">
 <link rel="import" href="feedback-dialog.html">
@@ -52,6 +54,22 @@ Example:
 <dom-module id="binarytree-visualisation">
   <template>
     <style>
+      ::-webkit-scrollbar {
+          height: 12px;
+          width: 6px;
+          background: #F1F1F1;
+      }
+
+      ::-webkit-scrollbar-corner {
+          background: #F1F1F1;
+          -webkit-border-radius: 1ex;
+      }
+
+      ::-webkit-scrollbar-thumb {
+          background: #BCBCBC;
+          -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.41);
+      }
+
       :host {
         display: block;
         width: 100%;
@@ -95,6 +113,19 @@ Example:
         position: absolute;
         top: 50%;
         margin-top: -8px;
+      }
+      #changeHistory {
+        visibility: collapse;
+        position: absolute;
+        background: #fff;
+        right: 24px;
+        top: 64px;
+        width: 250px;
+        height: 500px;
+      }
+      .historyStamp {
+        float: right;
+        font-size: small;
       }
     </style>
     <paper-toast id="noVal" text="Please provide an value"></paper-toast>
@@ -201,15 +232,28 @@ Example:
       </paper-header-panel>
       <paper-header-panel main>
         <paper-toolbar>
+          <!-- Start left align -->
           <paper-icon-button icon="view-list" on-tap="openDrawer" paper-drawer-toggle>
           </paper-icon-button>
-          <!-- <paper-button on-tap="requestTraverse">Traverse</paper-button> -->
+          <!-- End -->
+          <span style="flex: 1" ></span>
+          <!-- Start right align -->
+          <paper-icon-button icon="change-history" on-tap="openChangeHistory"></paper-icon-button>
+          <!-- End -->
         </paper-toolbar>
         <section id="treeContainer">
-          
+
         </section>
       </paper-header-panel>
     </paper-drawer-panel>
+
+    <paper-material id="changeHistory" elevation="3" style="overflow-y: scroll">
+      <h3 style="margin: 8px">test</h3>
+      <paper-item>
+        <span style="flex: 1">tree.left.right</span>
+        <span class="historyStamp">19:23 13.02.</span>
+      </paper-item>
+    </paper-material>
 
     <paper-fab icon="add" on-tap="addTree"></paper-fab>
   </template>
@@ -229,7 +273,8 @@ Example:
       listeners: {
         'iron-overlay-closed': '_onIronOverlayClosed',
         'deleteTree': '_deleteTree',
-        'traverseSubtree': '_traverseSubtree'
+        'traverseSubtree': '_traverseSubtree',
+        'tap': '_onTap'
       },
 
       /**
@@ -404,6 +449,42 @@ Example:
         return result;
       },
 
+      openChangeHistory: function() {
+        this.$.changeHistory.innerHTML = '';
+        
+        var trees = this.querySelectorAll('binary-tree');
+        for(var i=0; i<trees.length; i++) {
+          var header = document.createElement('h3');
+          header.innerHTML = trees[i].name;
+          header.style.margin = '8px';
+          this.$.changeHistory.appendChild(header);
+
+          var history = trees[i].history;
+          for(var j=0; j<history.length; j++) {
+            var item = document.createElement('paper-item');
+            var path = document.createElement('span');
+            var stamp = document.createElement('span');
+            var date = history[j].timestamp;
+
+            path.innerHTML = history[j].changeRecord.path;
+            path.style.flex = 1;
+            item.appendChild(path);
+
+            stamp.innerHTML = date.getHours() + ':' + date.getMinutes() + ' ' + date.getDate() + '.' + date.getMonth() + '.';
+            stamp.classList.add('historyStamp');
+            item.appendChild(stamp);
+
+            this.$.changeHistory.appendChild(item);
+          }
+        }
+
+        this.$.changeHistory.style.visibility = 'visible';
+      },
+
+      closeChangeHistory: function() {
+        this.$.changeHistory.style.visibility = 'collapse';
+      },
+
       openDrawer: function() {
         this.$.drawer.forceNarrow = false;
         this.notifyDrawerResize();
@@ -432,6 +513,11 @@ Example:
         }
         if(this._request)
           window.requestAnimationFrame(this._notifyResize.bind(this));
+      },
+
+      _onTap: function(e) {
+        if(e.target.id !== 'changeHistory' && e.target.icon !== 'change-history')
+          this.closeChangeHistory();
       },
 
       /**
