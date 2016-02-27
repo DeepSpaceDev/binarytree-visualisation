@@ -32,6 +32,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../paper-fab/paper-fab.html">
 <link rel="import" href="../paper-item/paper-item.html">
 
+<script src="../clipboard.js/clipboard.js"></script>
+
+<link rel="import" href="binarytree-versioning.html">
 <link rel="import" href="binary-tree.html">
 <link rel="import" href="binary-node.html">
 <link rel="import" href="feedback-dialog.html">
@@ -201,15 +204,22 @@ Example:
       </paper-header-panel>
       <paper-header-panel main>
         <paper-toolbar>
+          <!-- Start left align -->
           <paper-icon-button icon="view-list" on-tap="openDrawer" paper-drawer-toggle>
           </paper-icon-button>
-          <!-- <paper-button on-tap="requestTraverse">Traverse</paper-button> -->
+          <!-- End -->
+          <span style="flex: 1" ></span>
+          <!-- Start right align -->
+          <paper-icon-button icon="change-history" on-tap="openChangeHistory"></paper-icon-button>
+          <!-- End -->
         </paper-toolbar>
         <section id="treeContainer">
-          
+
         </section>
       </paper-header-panel>
     </paper-drawer-panel>
+
+    <binarytree-versioning id="versioning"></binarytree-versioning>
 
     <paper-fab icon="add" on-tap="addTree"></paper-fab>
   </template>
@@ -229,7 +239,9 @@ Example:
       listeners: {
         'iron-overlay-closed': '_onIronOverlayClosed',
         'deleteTree': '_deleteTree',
-        'traverseSubtree': '_traverseSubtree'
+        'traverseSubtree': '_traverseSubtree',
+        'tap': '_onTap',
+        'switch-to-version': 'switchToVersion'
       },
 
       /**
@@ -404,6 +416,61 @@ Example:
         return result;
       },
 
+      switchToVersion: function(e) {
+        var tree = e.detail.tree;
+        var version = e.detail.version;
+
+        var targetTree = Polymer.dom(this.root).querySelectorAll('binary-tree')[tree];
+        var targetVersion = targetTree.history[version];
+
+        var changeRecord = targetVersion.changeRecord;
+
+        targetTree.set(changeRecord.path, changeRecord.value);
+      },
+
+      openChangeHistory: function() {
+        var versioning = [];
+        
+        var trees = this.querySelectorAll('binary-tree');
+        for(var i=0; i<trees.length; i++) {
+          var versions = [];
+
+          var history = trees[i].history;
+          for(var j=0; j<history.length; j++) {
+            var date = history[j].timestamp;
+
+            var path = history[j].changeRecord.path;
+
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var day = date.getDate();
+            var month = date.getMonth() + 1;
+
+            var stamp = ((hours < 10) ? "0" + hours : hours) + ':' + 
+                        ((minutes < 10) ? "0" + minutes : minutes) + ' ' + 
+                        ((day < 10) ? "0" + day : day) + '.' + 
+                        ((month < 10) ? "0" + month : month) + '.';
+
+            var version = {
+              path: path,
+              timestamp: stamp
+            };
+            versions.push(version);
+          }
+          var treeVersion = {
+            name: trees[i].name,
+            versions: versions
+          };
+          versioning.push(treeVersion);
+        }
+        this.$.versioning.versioning = versioning.length < 1 ? null : versioning;
+        this.$.versioning.open();
+      },
+
+      closeChangeHistory: function() {
+        this.$.versioning.close();
+      },
+
       openDrawer: function() {
         this.$.drawer.forceNarrow = false;
         this.notifyDrawerResize();
@@ -432,6 +499,11 @@ Example:
         }
         if(this._request)
           window.requestAnimationFrame(this._notifyResize.bind(this));
+      },
+
+      _onTap: function(e) {
+        if(e.target.id !== 'changeHistory' && e.target.icon !== 'change-history')
+          this.closeChangeHistory();
       },
 
       /**

@@ -115,6 +115,10 @@
           type: String,
           value: ''
         },
+        history: {
+          type: Array,
+          value: function() {return [];}
+        },
         /**
          * The complete tree structure
          * Each node has a `node`, a `left` and a `right` attribute,
@@ -155,7 +159,8 @@
         'nodeMoved': 'repaintConnections',
         'addChild': '_onAddChild',
         'iron-overlay-closed': 'addChild',
-        'nodeContext': '_onNodeContext'
+        'nodeContext': '_onNodeContext',
+        'drawerChanged': 'repaintConnections'
       },
 
       observers: [
@@ -249,7 +254,11 @@
         this.computeCompletness();
         // var nodes = this.querySelectorAll('binary-node');
         // var node = changeRecord.value;
-        console.log(changeRecord);
+        var clone = JSON.parse(JSON.stringify(changeRecord));
+        this.push('history', {
+          changeRecord: clone,
+          timestamp: new Date()
+        });
         var path = changeRecord.path;
 
         // Remove Occurence of 'value'
@@ -479,7 +488,8 @@
       copySubtree: function(path) {
         var node = this.get(path);
         var jsonNode = JSON.stringify(node);
-        setCookie('clipboard', jsonNode, 100);
+        // cookie = MD5('clipboard')
+        setCookie('bbc4df4047bb91ef515ce03a6317fd65', jsonNode, 100);
       },
 
       _cutSubtree: function() {
@@ -491,7 +501,8 @@
       cutSubtree: function(path) {
         var node = this.get(path);
         var jsonNode = JSON.stringify(node);
-        setCookie('clipboard', jsonNode, 100);
+        // cookie = MD5('clipboard')
+        setCookie('bbc4df4047bb91ef515ce03a6317fd65', jsonNode, 100);
         this.set(path, null);
       },
 
@@ -502,7 +513,8 @@
       },
 
       pasteSubtree: function(path) {
-        var clipboard = getCookie('clipboard');
+        // cookie = MD5('clipboard')
+        var clipboard = getCookie('bbc4df4047bb91ef515ce03a6317fd65');
         var node = JSON.parse(clipboard);
         var parentNode = this.get(path);
         if(this.compareNode(parentNode.value, node.value) > 0)
@@ -667,6 +679,10 @@
             return;
           this.$.context.style.visibility = 'collapse';
         }
+      },
+
+      setTree: function(path, value) {
+        this.set(path, value);
       },
 
       getParentApp: function() {
