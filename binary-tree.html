@@ -252,8 +252,9 @@
         this.computeCompletness();
         // var nodes = this.querySelectorAll('binary-node');
         // var node = changeRecord.value;
+        var clone = JSON.parse(JSON.stringify(changeRecord));
         this.push('history', {
-          changeRecord: changeRecord,
+          changeRecord: clone,
           timestamp: new Date()
         });
         var path = changeRecord.path;
@@ -676,6 +677,10 @@
             return;
           this.$.context.style.visibility = 'collapse';
         }
+      },
+
+      setTree: function(path, value) {
+        this.set(path, value);
       },
 
       getParentApp: function() {

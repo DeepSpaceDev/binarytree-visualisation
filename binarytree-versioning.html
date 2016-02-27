@@ -1,0 +1,103 @@
+<!--
+A comment describing this element
+
+Example:
+
+	<my-elem></my-elem>
+
+Example:
+
+	<my-elem>
+	  <h2>Hello my-elem</h2>
+	</my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="binarytree-versioning">
+	<template>
+		<style>
+			::-webkit-scrollbar {
+				height: 12px;
+				width: 6px;
+				background: #F1F1F1;
+			}
+
+			::-webkit-scrollbar-corner {
+				background: #F1F1F1;
+				-webkit-border-radius: 1ex;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #BCBCBC;
+				-webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.41);
+			}
+			h3 {
+				margin: 8px
+			}
+			#changeHistory {
+				visibility: collapse;
+				position: absolute;
+				background: #fff;
+				right: 24px;
+				top: 64px;
+				width: 400px;
+				height: 500px;
+			}
+			.historyStamp {
+				float: right;
+				font-size: small;
+			}
+		</style>
+		<paper-material id="changeHistory" elevation="3" style="overflow-y: scroll">
+			<template is="dom-if" if={{!versioning}}>
+				<h3>Keine Bäume für Versioning verhanden</h3>
+			</template>
+			<template is="dom-repeat" id="treeRepeat" items={{versioning}} as="tree">
+				<h3>[[tree.name]]</h3>
+				<template is="dom-repeat" id="versionRepeat" items={{tree.versions}} as="version">
+					<paper-item on-tap="switchToVersion">
+						<span style="flex: 1">[[version.path]]</span>
+						<span class="historyStamp">[[version.timestamp]]</span>
+					</paper-item>
+				</template>
+			</template>
+		</paper-material>
+	</template>
+	<script>
+		Polymer({
+			is: 'binarytree-versioning',
+
+			properties: {
+				versioning: {
+					type: Array,
+					value: null
+				}
+			},
+
+			switchToVersion: function(e) {
+				var versionModel = e.model;
+				var treeModel = versionModel.dataHost.dataHost;
+
+				var versionIndex = versionModel.__data__.index;
+				var treeIndex = treeModel.__data__.index;
+
+				console.log(treeIndex);
+				console.log(versionIndex);
+
+				this.fire('switch-to-version', {
+					tree: treeIndex,
+					version: versionIndex
+				});
+			},
+
+			open: function() {
+				this.$.changeHistory.style.visibility = 'visible';
+			},
+
+			close: function() {
+				this.$.changeHistory.style.visibility = 'collapse';
+			}
+		});
+	</script>
+</dom-module>
